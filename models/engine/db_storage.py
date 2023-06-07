@@ -95,11 +95,33 @@ class DBStorage:
         """
         self.__session.close()
 
-    def get(cls, id):
+    def get(self, cls, id):
         """
-            Retrieve the obj from the storage based on the given id
+            cls: class name
+            id: string representing the id of the object
+            returns the object based on the class and it's id
         """
-        if cls is None or id is None:
-            return None
-        key = "{}.{}".format(cls.__class__.__name__, id)
-        return
+        object = {}
+        if cls and id:
+            all_objs = self.__session.query(cls).all()
+            for obj in all_objs:
+                key = f"{type(obj).__name__}.{obj.id}"
+                object[key] = obj
+            return object[key]
+
+    def count(self, cls=None):
+        """
+            cls: class name
+            return the number of objects in that class
+        """
+        if cls:
+            # return the number of objects in taht class
+            all_objs = self.__session.query(cls).all()
+            return len(all_objs)
+        else:
+            # return the number of objects in all classes
+            classes = [State, Amenity, Place, City, Review, User]
+            objs_count = 0
+            for clss in classes:
+                objs_count += len(self.all(clss))
+            return objs_count
