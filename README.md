@@ -1,1 +1,7 @@
-# 0x05. AirBnB clone - RESTful API
+# Airbnb clone
+# description
+# how to start it
+# how to use it
+# examples
+
+# Authors
