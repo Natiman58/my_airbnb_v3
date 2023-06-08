@@ -16,7 +16,6 @@ def handle_not_found_error(error):
     response.status_code = 404
     return response
 
-
 @app.teardown_appcontext
 def teardown_appcontext(exception):
     storage.close()
