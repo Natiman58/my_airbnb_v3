@@ -55,8 +55,6 @@ def update_amenity_by_amenity_id(amenity_id):
     if not data:
         return jsonify({'Not a JSON'}), 400
 
-    data['amenity_id'] = amenity_id
-
     for key, value in data.items():
         if key not in ['id', 'created_at', 'updated_at']:
             setattr(amenity, key, value)
