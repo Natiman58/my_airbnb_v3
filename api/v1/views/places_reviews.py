@@ -7,6 +7,7 @@ from flask import jsonify, abort, request
 from api.v1.views import app_views
 from models.review import Review
 from models.place import Place
+from models.user import User
 from models import storage
 
 
@@ -48,7 +49,15 @@ def create_reviews_by_place_id(place_id):
     if 'text' not in data:
         return jsonify({'Missing text'}), 400
 
+    user_id = data['user_id']
+    user = storage.get(User, user_id)
+
+    if not user:
+        abort(404)
+
+    data['user_id'] = user_id
     data['place_id'] = place_id
+
     review = Review(**data)
     storage.new(review)
     storage.save()
