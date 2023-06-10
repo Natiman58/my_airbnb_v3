@@ -14,6 +14,7 @@ from models.review import Review
 from models.state import State
 from models.user import User
 from sqlalchemy.orm import sessionmaker, scoped_session
+import hashlib
 
 class DBStorage:
     """
@@ -65,6 +66,10 @@ class DBStorage:
         """
             adds new obj into the db session
         """
+        # If the object is User; hash the password and add it to the DB session
+        if isinstance(obj, User):
+            obj.password = hashlib.md5(obj.password.encode()).hexdigest()
+        # else just add it to the DB
         self.__session.add(obj)
 
     def save(self):

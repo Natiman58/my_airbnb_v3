@@ -13,6 +13,7 @@ from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review  import Review
+import hashlib
 
 class FileStorage:
     """
@@ -61,15 +62,18 @@ class FileStorage:
             serialization
         """
         obj_dict = {}
-        for key, val in self.__objects.items():
-            if isinstance(val, BaseModel):
-                new_val = val.to_dict()
+        for key, obj in self.__objects.items():
+            if isinstance(obj, BaseModel):
+                new_val = obj.to_dict()
                 obj_dict[key] = new_val
-            elif isinstance(val, datetime):
+            if isinstance(obj, datetime):
                 new_val = datetime.isostream()
                 obj_dict[key] = new_val
+            if isinstance(obj, User):
+                hashed_pwd = hashlib.md5(obj.password.encode()).hexdigest()
+                obj.password = hashed_pwd
             else:
-                obj_dict[key] = val
+                obj_dict[key] = obj.to_dict()
 
         with open(self.__file_path, 'w', encoding="utf-8") as f:
             json.dump(obj_dict, f, indent=4)

@@ -49,9 +49,10 @@ class BaseModel:
         storage.new(self)  # moved to here
         storage.save()
 
-    def to_dict(self):
+    def to_dict(self, include_password=False):
         """
             returns all the attributes in the class obj
+            use password only when to store it in FS
         """
         d = self.__dict__.copy()
         if '_sa_instance_state' in d:
@@ -61,6 +62,8 @@ class BaseModel:
             d['created_at'] = self.created_at.isoformat()
         if self.updated_at is not None:
             d['updated_at'] = self.updated_at.isoformat()
+        if not include_password and 'password' in d:
+            del d['password']
         return d
 
     def delete(self):

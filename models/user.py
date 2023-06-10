@@ -7,6 +7,7 @@ from datetime import datetime
 import json
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
+import hashlib
 
 
 class User(BaseModel, Base):
@@ -22,8 +23,12 @@ class User(BaseModel, Base):
     places = relationship("Place", cascade="all, delete", backref="user")
     reviews = relationship("Review", cascade="all, delete", backref="user")
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, password='', **kwargs):
+        super().__init__(**kwargs)
+        self.password = hashlib.md5(password.encode()).hexdigest()
+
+    def update_password(self, new_password):
+        self.password = hashlib.md5(new_password.encode()).hexdigest()
 
     def all(self):
         """
