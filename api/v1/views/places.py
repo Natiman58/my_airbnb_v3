@@ -7,6 +7,7 @@ from flask import request, abort, jsonify
 from models.place import Place
 from models.city import City
 from models.user import User
+from models.state import State
 from api.v1.views import app_views
 from models import storage
 
@@ -23,6 +24,36 @@ def get_places_by_place_id(place_id):
     if not place:
         abort(404)
     return jsonify(place.to_dict()), 200
+
+@app_views.route('/places_search', methods=['POST'], strict_slashes=False)
+def get_places_by_JSON_request_body():
+    data = request.get_json()
+    if not data:
+        return jsonify({'Not a JSON'}), 400
+
+    state_ids = data.get('states', [])
+    city_ids = data.get('cities', [])
+    amenity_ids = data.get('amenities', [])
+
+    places = []
+    if not state_ids and not city_ids:
+        places = storage.all(Place).values()
+        print(places)
+    for state_id in state_ids:
+        state = storage.get(State, state_id)
+        cities = state.cities
+        for city in cities:
+            places.extend(city.places)
+    for city_id in city_ids:
+        city = storage.get(City, city_id)
+        if city:
+            places.extend(city.places)
+    if amenity_ids:
+        places = [place for place in places if all(amenity_id in places.amenity_id for amenity_id in amenity_ids)]
+
+    place_dict = [place.to_dict() for place in places]
+
+    return jsonify(place_dict), 200
 
 @app_views.route('/places/<place_id>', methods=['DELETE'], strict_slashes=False)
 def delete_places_by_place_id(place_id):
